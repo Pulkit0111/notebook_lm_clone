@@ -1,8 +1,10 @@
-import { ChakraProvider, Box, Flex, Container, useColorMode, IconButton, Heading, Text, HStack } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MoonIcon, SunIcon } from '@chakra-ui/icons';
-import { PDFUpload } from './components/PDFUpload';
-import { ChatInterface } from './components/ChatInterface';
+import { useState, useEffect } from 'react';
+import { NotebookList } from './components/NotebookList';
+import { NotebookView } from './components/NotebookView';
+import { Notebook } from './types';
+import { useFileUpload } from './hooks/useFileUpload';
 import { useSession } from './hooks/useSession';
 import theme from './theme';
 
@@ -15,78 +17,136 @@ const queryClient = new QueryClient({
   },
 });
 
-function ColorModeToggle() {
-  const { colorMode, toggleColorMode } = useColorMode();
-
-  return (
-    <IconButton
-      aria-label="Toggle color mode"
-      icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-      onClick={toggleColorMode}
-      variant="ghost"
-      size="md"
-    />
-  );
-}
-
 function AppContent() {
-  const { pdfFilename } = useSession();
-  const { colorMode } = useColorMode();
+  const { upload } = useFileUpload();
+  const { setSession, clearSession } = useSession();
+
+  // Initialize notebooks from localStorage
+  const [notebooks, setNotebooks] = useState<Notebook[]>(() => {
+    const stored = localStorage.getItem('notebooks');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        // Convert date strings back to Date objects
+        return parsed.map((nb: any) => ({
+          ...nb,
+          createdAt: new Date(nb.createdAt),
+          lastAccessed: new Date(nb.lastAccessed),
+          messages: (nb.messages || []).map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+          })),
+        }));
+      } catch (error) {
+        console.error('Error parsing notebooks from localStorage:', error);
+        return [];
+      }
+    }
+    return [];
+  });
+
+  const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null);
+
+  // Save notebooks to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('notebooks', JSON.stringify(notebooks));
+  }, [notebooks]);
+
+  const handleNotebookCreate = async (name: string, file: File) => {
+    try {
+      // Upload the PDF
+      const response = await upload(file);
+      
+      if (response) {
+        // Create new notebook
+        const newNotebook: Notebook = {
+          id: crypto.randomUUID(),
+          name,
+          pdfFilename: response.filename,
+          sessionId: response.session_id,
+          numChunks: response.num_chunks,
+          createdAt: new Date(),
+          lastAccessed: new Date(),
+          messages: [],
+        };
+
+        // Add to notebooks list
+        setNotebooks((prev) => [newNotebook, ...prev]);
+      }
+    } catch (error) {
+      console.error('Failed to create notebook:', error);
+      // Re-throw to let the modal handle it
+      throw error;
+    }
+  };
+
+  const handleNotebookSelect = (notebook: Notebook) => {
+    // Update last accessed time
+    const updatedNotebooks = notebooks.map((nb) =>
+      nb.id === notebook.id
+        ? { ...nb, lastAccessed: new Date() }
+        : nb
+    );
+    setNotebooks(updatedNotebooks);
+
+    // Set session data
+    setSession(notebook.sessionId, notebook.pdfFilename, notebook.numChunks);
+
+    // Select notebook
+    setSelectedNotebook(notebook);
+  };
+
+  const handleBackToList = () => {
+    // Clear session
+    clearSession();
+    setSelectedNotebook(null);
+  };
+
+  const handleNotebookDelete = (notebookId: string) => {
+    // Remove from state
+    setNotebooks((prev) => prev.filter((nb) => nb.id !== notebookId));
+    
+    // If currently viewing this notebook, go back to list
+    if (selectedNotebook?.id === notebookId) {
+      handleBackToList();
+    }
+  };
+
+  const handleMessagesChange = (notebookId: string, messages: any[]) => {
+    // Update messages in the notebooks state
+    setNotebooks((prev) =>
+      prev.map((nb) =>
+        nb.id === notebookId
+          ? { ...nb, messages, lastAccessed: new Date() }
+          : nb
+      )
+    );
+
+    // Also update selected notebook if it's the current one
+    if (selectedNotebook?.id === notebookId) {
+      setSelectedNotebook((prev) =>
+        prev ? { ...prev, messages, lastAccessed: new Date() } : null
+      );
+    }
+  };
 
   return (
-    <Flex direction="column" h="100vh" bg={colorMode === 'dark' ? 'gray.900' : 'gray.50'}>
-      {/* Header */}
-      <Box
-        bg={colorMode === 'dark' ? 'gray.800' : 'white'}
-        borderBottom="1px"
-        borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
-        px={6}
-        py={4}
-      >
-        <Flex justify="space-between" align="center" maxW="1400px" mx="auto">
-          <HStack spacing={3}>
-            <Box
-              bg="brand.500"
-              color="white"
-              p={2}
-              borderRadius="md"
-              fontWeight="bold"
-              fontSize="xl"
-            >
-              📄
-            </Box>
-            <Box>
-              <Heading size="md" fontWeight="600">
-                PDF RAG Assistant
-              </Heading>
-              <Text fontSize="sm" color={colorMode === 'dark' ? 'gray.400' : 'gray.600'}>
-                Chat with your documents, powered by AI
-              </Text>
-            </Box>
-          </HStack>
-          <ColorModeToggle />
-        </Flex>
-      </Box>
-
-      {/* Main Content */}
-      <Container maxW="1400px" flex="1" py={6} overflow="hidden">
-        <Flex gap={6} h="full">
-          {/* Left Panel - PDF Upload & Info */}
-          <Box
-            w={pdfFilename ? '320px' : '400px'}
-            flexShrink={0}
-            transition="width 0.3s"
-          >
-            <PDFUpload />
-          </Box>
-
-          {/* Right Panel - Chat */}
-          <Box flex="1" minW="0" h="full">
-            <ChatInterface />
-          </Box>
-        </Flex>
-      </Container>
-    </Flex>
+    <>
+      {!selectedNotebook ? (
+        <NotebookList
+          notebooks={notebooks}
+          onNotebookSelect={handleNotebookSelect}
+          onNotebookCreate={handleNotebookCreate}
+          onNotebookDelete={handleNotebookDelete}
+        />
+      ) : (
+        <NotebookView
+          notebook={selectedNotebook}
+          onBack={handleBackToList}
+          onMessagesChange={(messages) => handleMessagesChange(selectedNotebook.id, messages)}
+        />
+      )}
+    </>
   );
 }
 

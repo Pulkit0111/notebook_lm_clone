@@ -53,3 +53,14 @@ export interface Message {
   webSources?: WebSource[];
 }
 
+export interface Notebook {
+  id: string;
+  name: string;
+  pdfFilename: string;
+  sessionId: string;
+  numChunks: number;
+  createdAt: Date;
+  lastAccessed: Date;
+  messages: Message[];
+}
+

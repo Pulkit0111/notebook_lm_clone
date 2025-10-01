@@ -1,139 +1,139 @@
 import React from 'react';
 import {
   Box,
-  VStack,
-  Card,
-  CardBody,
   useColorMode,
   Text,
   Flex,
   Button,
   useDisclosure,
+  VStack,
 } from '@chakra-ui/react';
-import { DeleteIcon } from '@chakra-ui/icons';
-import { MessageList } from './MessageList';
+import { Message as MessageComponent } from './Message';
+import { LoadingIndicator } from './LoadingIndicator';
 import { ChatInput } from './ChatInput';
 import { ClearChatModal } from './ClearChatModal';
 import { useChat } from '@/hooks/useChat';
-import { useSession } from '@/hooks/useSession';
+import { Message as MessageType } from '@/types';
 
-export const ChatInterface: React.FC = () => {
-  const { messages, sendMessage, isLoading, clearMessages } = useChat();
-  const { pdfFilename, clearSession } = useSession();
+interface ChatInterfaceProps {
+  initialMessages?: MessageType[];
+  onMessagesChange?: (messages: MessageType[]) => void;
+}
+
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
+  initialMessages = [], 
+  onMessagesChange 
+}) => {
+  const { messages, sendMessage, isLoading, clearMessages } = useChat({
+    initialMessages,
+    onMessagesChange,
+  });
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleClearChat = () => {
     clearMessages();
-    clearSession();
     onClose();
   };
 
-  if (!pdfFilename) {
-    return (
-      <Card
-        h="full"
-        bg={colorMode === 'dark' ? 'gray.800' : 'white'}
-        boxShadow="lg"
-        borderRadius="xl"
-      >
-        <CardBody>
-          <Flex
-            h="full"
-            align="center"
-            justify="center"
-            direction="column"
-            gap={4}
-          >
-            <Box textAlign="center">
-              <Text
-                fontSize="2xl"
-                fontWeight="600"
-                color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}
-                mb={2}
-              >
-                Welcome to PDF RAG Assistant
-              </Text>
-              <Text
-                fontSize="md"
-                color={colorMode === 'dark' ? 'gray.500' : 'gray.600'}
-              >
-                Upload a PDF document to start an intelligent conversation
-              </Text>
-            </Box>
-            <Box
-              fontSize="6xl"
-              opacity={0.5}
-              filter={colorMode === 'dark' ? 'grayscale(1)' : 'none'}
-            >
-              💬
-            </Box>
-          </Flex>
-        </CardBody>
-      </Card>
-    );
-  }
-
   return (
     <>
-      <Card
-        h="full"
-        bg={colorMode === 'dark' ? 'gray.800' : 'white'}
-        boxShadow="lg"
-        borderRadius="xl"
-        display="flex"
-        flexDirection="column"
-        overflow="hidden"
-      >
-        <CardBody p={0} display="flex" flexDirection="column" h="full" overflow="hidden">
-          {/* Chat Header */}
-          <Flex
-            px={6}
-            py={4}
-            borderBottom="1px"
-            borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
-            justify="space-between"
-            align="center"
-            flexShrink={0}
-          >
-            <Box>
-              <Text fontSize="lg" fontWeight="600">
-                Chat
-              </Text>
-              <Text fontSize="sm" color={colorMode === 'dark' ? 'gray.400' : 'gray.600'}>
-                Ask questions about your document
-              </Text>
-            </Box>
-            {messages.length > 0 && (
-              <Button
-                leftIcon={<DeleteIcon />}
-                size="sm"
-                variant="ghost"
-                colorScheme="red"
-                onClick={onOpen}
+      <Box position="relative" h="full" display="flex" flexDirection="column">
+        {/* Minimal Chat Header - Sticky */}
+        <Flex
+          h="48px"
+          px={6}
+          borderBottom="1px"
+          borderColor={colorMode === 'dark' ? 'neutral.800' : 'neutral.300'}
+          justify="space-between"
+          align="center"
+          flexShrink={0}
+          bg={colorMode === 'dark' ? 'darkBg.primary' : 'white'}
+          position="sticky"
+          top={0}
+          zIndex={10}
+        >
+          <Text fontSize="sm" fontWeight="medium" color={colorMode === 'dark' ? 'neutral.200' : 'neutral.900'}>
+            Chat
+          </Text>
+          {messages.length > 0 && (
+            <Button
+              size="xs"
+              variant="ghost"
+              onClick={onOpen}
+              fontSize="xs"
+              color={colorMode === 'dark' ? 'neutral.400' : 'neutral.600'}
+            >
+              Clear
+            </Button>
+          )}
+        </Flex>
+
+        {/* Messages - Scrollable Area */}
+        <Box 
+          flex="1" 
+          overflowY="auto"
+          minH={0}
+          css={{
+            '&::-webkit-scrollbar': {
+              width: '6px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: colorMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+              borderRadius: '3px',
+            },
+          }}
+        >
+          <Box px={6} py={4}>
+            {messages.length === 0 ? (
+              <Flex
+                h="full"
+                minH="400px"
+                align="center"
+                justify="center"
               >
-                Clear
-              </Button>
+                <VStack spacing={2}>
+                  <Text
+                    fontSize="sm"
+                    fontWeight="medium"
+                    color={colorMode === 'dark' ? 'neutral.400' : 'neutral.600'}
+                  >
+                    No messages yet
+                  </Text>
+                  <Text
+                    fontSize="xs"
+                    color={colorMode === 'dark' ? 'neutral.500' : 'neutral.500'}
+                  >
+                    Start by asking a question about your PDF
+                  </Text>
+                </VStack>
+              </Flex>
+            ) : (
+              <VStack spacing={4} align="stretch">
+                {messages.map((message) => (
+                  <MessageComponent key={message.id} message={message} />
+                ))}
+                {isLoading && <LoadingIndicator />}
+              </VStack>
             )}
-          </Flex>
-
-          {/* Messages */}
-          <Box flex="1" overflow="hidden" minH="0">
-            <MessageList messages={messages} isLoading={isLoading} />
           </Box>
+        </Box>
 
-          {/* Input */}
-          <Box
-            px={6}
-            py={4}
-            borderTop="1px"
-            borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
-            flexShrink={0}
-          >
-            <ChatInput onSend={sendMessage} isLoading={isLoading} />
-          </Box>
-        </CardBody>
-      </Card>
+        {/* Input - Sticky */}
+        <Box
+          px={6}
+          py={4}
+          borderTop="1px"
+          borderColor={colorMode === 'dark' ? 'neutral.800' : 'neutral.300'}
+          flexShrink={0}
+          bg={colorMode === 'dark' ? 'darkBg.primary' : 'white'}
+          position="sticky"
+          bottom={0}
+          zIndex={10}
+        >
+          <ChatInput onSend={sendMessage} isLoading={isLoading} />
+        </Box>
+      </Box>
 
       <ClearChatModal
         isOpen={isOpen}
