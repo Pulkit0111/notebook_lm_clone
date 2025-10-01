@@ -2,7 +2,6 @@
 
 A modern, full-stack Retrieval-Augmented Generation (RAG) application inspired by Google's Notebook LM. Upload PDF documents, organize them into notebooks, and have intelligent conversations with persistent chat history. Built with React + Vite and FastAPI, featuring a beautiful Material Design-inspired UI powered by Chakra UI.
 
-![Progression LM](https://img.shields.io/badge/Progression_LM-NotebookLM_Clone-1A73E8?style=for-the-badge)
 ![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=flat-square&logo=fastapi)
@@ -235,10 +234,6 @@ pdf-rag-full-stack/
 │   ├── logs/                           # Application logs
 │   ├── requirements.txt
 │   └── .env                            # Environment variables
-├── docs/
-│   ├── prd.md                          # Product requirements
-│   ├── understanding.md                # Technical documentation
-│   └── UI_IMPROVEMENTS.md             # UI design guidelines
 └── README.md
 ```
 
