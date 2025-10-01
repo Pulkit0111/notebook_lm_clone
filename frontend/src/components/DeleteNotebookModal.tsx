@@ -15,16 +15,18 @@ import {
 } from '@chakra-ui/react';
 import { WarningIcon } from '@chakra-ui/icons';
 
-interface ClearChatModalProps {
+interface DeleteNotebookModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  notebookName: string;
 }
 
-export const ClearChatModal: React.FC<ClearChatModalProps> = ({
+export const DeleteNotebookModal: React.FC<DeleteNotebookModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
+  notebookName,
 }) => {
   const { colorMode } = useColorMode();
 
@@ -43,7 +45,7 @@ export const ClearChatModal: React.FC<ClearChatModalProps> = ({
           fontWeight="medium"
           color={colorMode === 'dark' ? 'neutral.200' : 'neutral.900'}
         >
-          Clear Chat
+          Delete Notebook
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody py={5}>
@@ -52,18 +54,18 @@ export const ClearChatModal: React.FC<ClearChatModalProps> = ({
               as={WarningIcon}
               w={10}
               h={10}
-              color="orange.400"
+              color="red.400"
             />
             <VStack spacing={2}>
               <Text fontSize="sm" fontWeight="medium" textAlign="center" color={colorMode === 'dark' ? 'neutral.200' : 'neutral.900'}>
-                Clear all messages?
+                Delete "{notebookName}"?
               </Text>
               <Text
                 fontSize="xs"
                 color={colorMode === 'dark' ? 'neutral.400' : 'neutral.600'}
                 textAlign="center"
               >
-                This will remove all messages and reset your session. This action cannot be undone.
+                This notebook and all its data will be permanently deleted. This action cannot be undone.
               </Text>
             </VStack>
           </VStack>
@@ -78,15 +80,15 @@ export const ClearChatModal: React.FC<ClearChatModalProps> = ({
             Cancel
           </Button>
           <Button 
-            colorScheme="red" 
             onClick={onConfirm} 
             size="sm"
             bg={colorMode === 'dark' ? 'red.600' : 'red.500'}
+            color="white"
             _hover={{
               bg: colorMode === 'dark' ? 'red.700' : 'red.600',
             }}
           >
-            Clear
+            Delete
           </Button>
         </ModalFooter>
       </ModalContent>

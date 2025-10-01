@@ -33,26 +33,29 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
   };
 
   return (
-    <HStack spacing={3} align="flex-end">
+    <HStack spacing={2} align="flex-end">
       <Box flex="1" position="relative">
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask a question about your document..."
-          size="lg"
+          size="md"
           resize="none"
           rows={1}
           maxRows={4}
           disabled={isLoading}
-          bg={colorMode === 'dark' ? 'gray.700' : 'gray.50'}
-          borderColor={colorMode === 'dark' ? 'gray.600' : 'gray.300'}
+          fontSize="sm"
+          bg={colorMode === 'dark' ? 'darkBg.tertiary' : 'white'}
+          borderColor={colorMode === 'dark' ? 'neutral.700' : 'neutral.300'}
+          borderWidth="1px"
+          borderRadius="md"
           _hover={{
-            borderColor: colorMode === 'dark' ? 'gray.500' : 'gray.400',
+            borderColor: colorMode === 'dark' ? 'neutral.600' : 'neutral.400',
           }}
           _focus={{
-            borderColor: 'brand.500',
-            boxShadow: `0 0 0 1px var(--chakra-colors-brand-500)`,
+            borderColor: colorMode === 'dark' ? 'brand.300' : 'brand.500',
+            boxShadow: `0 0 0 1px ${colorMode === 'dark' ? '#8AB4F8' : '#1A73E8'}`,
           }}
           _disabled={{
             opacity: 0.6,
@@ -66,28 +69,30 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
               background: 'transparent',
             },
             '&::-webkit-scrollbar-thumb': {
-              background: colorMode === 'dark' ? 'gray.600' : 'gray.400',
+              background: colorMode === 'dark' ? 'neutral.700' : 'neutral.400',
               borderRadius: '2px',
             },
           }}
         />
       </Box>
-      <Tooltip label="Send message (Enter)" placement="top">
+      <Tooltip label="Send (Enter)" placement="top">
         <IconButton
           aria-label="Send message"
           icon={<ArrowUpIcon />}
           onClick={handleSend}
           isDisabled={!input.trim() || isLoading}
           isLoading={isLoading}
-          colorScheme="brand"
-          size="lg"
-          borderRadius="xl"
-          boxShadow="md"
+          size="md"
+          borderRadius="full"
+          bg="brand.500"
+          color="white"
           _hover={{
-            transform: 'translateY(-2px)',
-            boxShadow: 'lg',
+            bg: 'brand.600',
           }}
-          transition="all 0.2s"
+          _active={{
+            bg: 'brand.700',
+          }}
+          transition="all 0.15s ease-out"
         />
       </Tooltip>
     </HStack>

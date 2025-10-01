@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Box,
   VStack,
-  Button,
   Text,
   useColorMode,
   Icon,
@@ -11,8 +10,6 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
-  Card,
-  CardBody,
   HStack,
   Badge,
   Divider,
@@ -54,174 +51,179 @@ export const PDFUpload: React.FC = () => {
   });
 
   return (
-    <Card
-      h="full"
-      bg={colorMode === 'dark' ? 'gray.800' : 'white'}
-      boxShadow="lg"
-      borderRadius="xl"
-    >
-      <CardBody>
-        <VStack spacing={4} align="stretch" h="full">
-          <Box>
-            <Text fontSize="lg" fontWeight="600" mb={1}>
-              Document Source
-            </Text>
-            <Text fontSize="sm" color={colorMode === 'dark' ? 'gray.400' : 'gray.600'}>
-              Upload a PDF to start chatting
-            </Text>
-          </Box>
+    <Box p={4} h="full">
+      <VStack spacing={4} align="stretch" h="full">
+        <Box>
+          <Text fontSize="sm" fontWeight="medium" color={colorMode === 'dark' ? 'neutral.200' : 'neutral.900'} mb={1}>
+            Sources
+          </Text>
+          <Text fontSize="xs" color={colorMode === 'dark' ? 'neutral.500' : 'neutral.600'}>
+            Upload documents to get started
+          </Text>
+        </Box>
 
-          <Divider />
+        <Divider borderColor={colorMode === 'dark' ? 'neutral.800' : 'neutral.300'} />
 
-          {!pdfFilename ? (
-            <Box
-              {...getRootProps()}
-              border="2px dashed"
-              borderColor={
-                isDragActive
-                  ? 'brand.500'
-                  : colorMode === 'dark'
-                  ? 'gray.600'
-                  : 'gray.300'
-              }
-              borderRadius="lg"
-              p={8}
-              textAlign="center"
-              cursor="pointer"
-              transition="all 0.2s"
-              bg={
-                isDragActive
-                  ? colorMode === 'dark'
-                    ? 'gray.700'
-                    : 'brand.50'
-                  : 'transparent'
-              }
-              _hover={{
-                borderColor: 'brand.500',
-                bg: colorMode === 'dark' ? 'gray.700' : 'brand.50',
-              }}
-            >
-              <input {...getInputProps()} />
-              <VStack spacing={3}>
-                <Icon
-                  as={AttachmentIcon}
-                  w={12}
-                  h={12}
-                  color={colorMode === 'dark' ? 'gray.400' : 'gray.500'}
-                />
-                {isDragActive ? (
-                  <Text fontWeight="500" color="brand.500">
-                    Drop your PDF here
-                  </Text>
-                ) : (
-                  <>
-                    <Text fontWeight="500">
-                      Drag & drop a PDF here
-                    </Text>
-                    <Text fontSize="sm" color={colorMode === 'dark' ? 'gray.400' : 'gray.600'}>
-                      or click to browse
-                    </Text>
-                  </>
-                )}
-              </VStack>
-            </Box>
-          ) : (
-            <VStack spacing={4} align="stretch">
-              <Alert
-                status="success"
-                variant="subtle"
-                borderRadius="lg"
-                bg={colorMode === 'dark' ? 'green.900' : 'green.50'}
-              >
-                <AlertIcon />
-                <Box flex="1">
-                  <AlertTitle fontSize="sm">Document Loaded</AlertTitle>
-                  <AlertDescription fontSize="xs">
-                    Ready to answer questions
-                  </AlertDescription>
-                </Box>
-              </Alert>
-
-              <Card
-                bg={colorMode === 'dark' ? 'gray.700' : 'gray.50'}
-                borderRadius="lg"
-              >
-                <CardBody>
-                  <VStack align="stretch" spacing={3}>
-                    <HStack justify="space-between">
-                      <Text fontSize="sm" fontWeight="500" noOfLines={1} flex="1">
-                        {pdfFilename}
-                      </Text>
-                      <HStack spacing={1}>
-                        <Icon as={CheckCircleIcon} color="green.500" />
-                        <Tooltip label="Remove document" placement="top">
-                          <IconButton
-                            aria-label="Remove document"
-                            icon={<CloseIcon />}
-                            size="xs"
-                            variant="ghost"
-                            colorScheme="red"
-                            onClick={handleRemovePDF}
-                          />
-                        </Tooltip>
-                      </HStack>
-                    </HStack>
-                    {numChunks && (
-                      <HStack spacing={2}>
-                        <Badge colorScheme="brand" fontSize="xs">
-                          {numChunks} chunks
-                        </Badge>
-                        <Text fontSize="xs" color={colorMode === 'dark' ? 'gray.400' : 'gray.600'}>
-                          indexed
-                        </Text>
-                      </HStack>
-                    )}
-                  </VStack>
-                </CardBody>
-              </Card>
-            </VStack>
-          )}
-
-          {isUploading && (
-            <VStack spacing={2} align="stretch">
-              <HStack justify="space-between">
-                <Text fontSize="sm" fontWeight="500">
-                  Uploading...
-                </Text>
-                <Text fontSize="sm" color="brand.500" fontWeight="600">
-                  {uploadProgress}%
-                </Text>
-              </HStack>
-              <Progress
-                value={uploadProgress}
-                size="sm"
-                colorScheme="brand"
-                borderRadius="full"
-                hasStripe
-                isAnimated
+        {!pdfFilename ? (
+          <Box
+            {...getRootProps()}
+            border="1px solid"
+            borderColor={
+              isDragActive
+                ? colorMode === 'dark' ? 'brand.300' : 'brand.500'
+                : colorMode === 'dark'
+                ? 'neutral.700'
+                : 'neutral.300'
+            }
+            borderRadius="md"
+            p={6}
+            textAlign="center"
+            cursor="pointer"
+            transition="all 0.15s ease-out"
+            bg={
+              isDragActive
+                ? colorMode === 'dark'
+                  ? 'darkBg.tertiary'
+                  : 'brand.50'
+                : 'transparent'
+            }
+            _hover={{
+              borderColor: colorMode === 'dark' ? 'brand.300' : 'brand.500',
+              bg: colorMode === 'dark' ? 'darkBg.tertiary' : 'neutral.100',
+            }}
+          >
+            <input {...getInputProps()} />
+            <VStack spacing={2}>
+              <Icon
+                as={AttachmentIcon}
+                w={8}
+                h={8}
+                color={colorMode === 'dark' ? 'neutral.500' : 'neutral.400'}
               />
+              {isDragActive ? (
+                <Text fontWeight="medium" fontSize="sm" color={colorMode === 'dark' ? 'brand.300' : 'brand.500'}>
+                  Drop your PDF here
+                </Text>
+              ) : (
+                <>
+                  <Text fontWeight="medium" fontSize="sm" color={colorMode === 'dark' ? 'neutral.300' : 'neutral.700'}>
+                    Drag & drop a PDF here
+                  </Text>
+                  <Text fontSize="xs" color={colorMode === 'dark' ? 'neutral.500' : 'neutral.600'}>
+                    or click to browse
+                  </Text>
+                </>
+              )}
             </VStack>
-          )}
-
-          {error && (
-            <Alert status="error" borderRadius="lg">
-              <AlertIcon />
+          </Box>
+        ) : (
+          <VStack spacing={3} align="stretch">
+            <Alert
+              status="success"
+              variant="subtle"
+              borderRadius="md"
+              bg={colorMode === 'dark' ? 'darkBg.tertiary' : 'neutral.100'}
+              border="1px solid"
+              borderColor={colorMode === 'dark' ? 'neutral.700' : 'neutral.300'}
+            >
+              <AlertIcon color="green.500" />
               <Box flex="1">
-                <AlertTitle fontSize="sm">Upload Failed</AlertTitle>
-                <AlertDescription fontSize="xs">
-                  {error.message || 'Failed to upload PDF'}
+                <AlertTitle fontSize="xs" color={colorMode === 'dark' ? 'neutral.200' : 'neutral.900'}>
+                  Document Loaded
+                </AlertTitle>
+                <AlertDescription fontSize="2xs" color={colorMode === 'dark' ? 'neutral.400' : 'neutral.600'}>
+                  Ready to chat
                 </AlertDescription>
               </Box>
             </Alert>
-          )}
 
-          <Box mt="auto" pt={4}>
-            <Text fontSize="xs" color={colorMode === 'dark' ? 'gray.500' : 'gray.500'}>
-              💡 Upload a PDF document to enable AI-powered conversations about its content
-            </Text>
-          </Box>
-        </VStack>
-      </CardBody>
-    </Card>
+            <Box
+              bg={colorMode === 'dark' ? 'darkBg.tertiary' : 'white'}
+              borderRadius="md"
+              p={3}
+              border="1px solid"
+              borderColor={colorMode === 'dark' ? 'neutral.700' : 'neutral.300'}
+            >
+              <VStack align="stretch" spacing={2}>
+                <HStack justify="space-between">
+                  <Text fontSize="xs" fontWeight="medium" noOfLines={1} flex="1" color={colorMode === 'dark' ? 'neutral.200' : 'neutral.900'}>
+                    {pdfFilename}
+                  </Text>
+                  <HStack spacing={1}>
+                    <Icon as={CheckCircleIcon} color="green.500" boxSize={3} />
+                    <Tooltip label="Remove document" placement="top">
+                      <IconButton
+                        aria-label="Remove document"
+                        icon={<CloseIcon />}
+                        size="xs"
+                        variant="ghost"
+                        onClick={handleRemovePDF}
+                      />
+                    </Tooltip>
+                  </HStack>
+                </HStack>
+                {numChunks && (
+                  <HStack spacing={2}>
+                    <Badge 
+                      fontSize="2xs"
+                      borderRadius="full"
+                      px={2}
+                      py={0.5}
+                      bg={colorMode === 'dark' ? 'brand.900' : 'brand.50'}
+                      color={colorMode === 'dark' ? 'brand.300' : 'brand.700'}
+                      fontWeight="medium"
+                    >
+                      {numChunks} chunks
+                    </Badge>
+                    <Text fontSize="2xs" color={colorMode === 'dark' ? 'neutral.500' : 'neutral.600'}>
+                      indexed
+                    </Text>
+                  </HStack>
+                )}
+              </VStack>
+            </Box>
+          </VStack>
+        )}
+
+        {isUploading && (
+          <VStack spacing={2} align="stretch">
+            <HStack justify="space-between">
+              <Text fontSize="xs" fontWeight="medium" color={colorMode === 'dark' ? 'neutral.300' : 'neutral.700'}>
+                Uploading...
+              </Text>
+              <Text fontSize="xs" color={colorMode === 'dark' ? 'brand.300' : 'brand.500'} fontWeight="medium">
+                {uploadProgress}%
+              </Text>
+            </HStack>
+            <Progress
+              value={uploadProgress}
+              size="sm"
+              colorScheme="brand"
+              borderRadius="full"
+              hasStripe
+              isAnimated
+            />
+          </VStack>
+        )}
+
+        {error && (
+          <Alert status="error" borderRadius="md" fontSize="xs">
+            <AlertIcon />
+            <Box flex="1">
+              <AlertTitle fontSize="xs">Upload Failed</AlertTitle>
+              <AlertDescription fontSize="2xs">
+                {error.message || 'Failed to upload PDF'}
+              </AlertDescription>
+            </Box>
+          </Alert>
+        )}
+
+        <Box mt="auto" pt={4}>
+          <Text fontSize="2xs" color={colorMode === 'dark' ? 'neutral.600' : 'neutral.500'}>
+            Upload a PDF document to start chatting
+          </Text>
+        </Box>
+      </VStack>
+    </Box>
   );
 };

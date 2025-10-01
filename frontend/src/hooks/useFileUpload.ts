@@ -49,7 +49,7 @@ export const useFileUpload = () => {
   });
 
   return {
-    upload: uploadMutation.mutate,
+    upload: uploadMutation.mutateAsync,
     isUploading: uploadMutation.isPending,
     uploadProgress: Math.round(uploadProgress),
     error: uploadMutation.error as ErrorResponse | null,

@@ -3,8 +3,6 @@ import {
   Box,
   HStack,
   Text,
-  Card,
-  CardBody,
   useColorMode,
   Spinner,
 } from '@chakra-ui/react';
@@ -16,23 +14,30 @@ export const LoadingIndicator: React.FC = () => {
   return (
     <HStack align="flex-start" spacing={3} justify="flex-end" w="full">
       <Box maxW="70%">
-        <Card
-          bg={colorMode === 'dark' ? 'green.700' : 'green.500'}
-          color="white"
-          boxShadow="lg"
-          borderRadius="2xl"
+        <Box
+          bg={colorMode === 'dark' ? 'darkBg.secondary' : 'neutral.100'}
+          color={colorMode === 'dark' ? 'neutral.100' : 'neutral.900'}
+          px={4}
+          py={3}
+          borderRadius="lg"
+          boxShadow="sm"
         >
-          <CardBody py={3} px={4}>
-            <HStack spacing={2}>
-              <Spinner size="sm" color="white" speed="0.8s" />
-              <Text fontSize="sm" color="white" fontWeight="500">
-                Thinking...
-              </Text>
-            </HStack>
-          </CardBody>
-        </Card>
+          <HStack spacing={2}>
+            <Spinner 
+              size="sm" 
+              color={colorMode === 'dark' ? 'brand.300' : 'brand.500'} 
+              speed="0.8s"
+              thickness="2px"
+            />
+            <Text fontSize="sm" fontWeight="medium">
+              Thinking...
+            </Text>
+          </HStack>
+        </Box>
       </Box>
-      <Box fontSize="2xl">🤖</Box>
+      <Text fontSize="xs" fontWeight="medium" color={colorMode === 'dark' ? 'neutral.400' : 'neutral.600'} mt={1}>
+        AI
+      </Text>
     </HStack>
   );
 };

@@ -1,12 +1,30 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/services/api';
 import { useSession } from './useSession';
 import type { Message, ErrorResponse } from '@/types';
 
-export const useChat = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+interface UseChatOptions {
+  initialMessages?: Message[];
+  onMessagesChange?: (messages: Message[]) => void;
+}
+
+export const useChat = (options: UseChatOptions = {}) => {
+  const { initialMessages = [], onMessagesChange } = options;
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const { sessionId } = useSession();
+
+  // Update messages when initialMessages change (e.g., switching notebooks)
+  useEffect(() => {
+    setMessages(initialMessages);
+  }, [initialMessages]);
+
+  // Notify parent component when messages change
+  useEffect(() => {
+    if (onMessagesChange) {
+      onMessagesChange(messages);
+    }
+  }, [messages, onMessagesChange]);
 
   const queryMutation = useMutation({
     mutationFn: async (question: string) => {
