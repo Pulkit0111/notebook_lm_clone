@@ -40,4 +40,4 @@ uploads/
 
 # Docker
 docker-compose.override.yml
-
+docs
